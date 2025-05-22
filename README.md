@@ -1,0 +1,3 @@
+# Biology-Quiz
+
+### Create an interactive biology quiz for middle school students that tests knowledge of basic concepts like cell structure, photosynthesis, and animal classification. Use emojis as visual elements throughout the quiz -  for plants,  for cells,  for lab cultures, and  for DNA. Track progress with a growing plant (→→) that develops as students answer correctly. Include three difficulty levels with age-appropriate questions. Use a nature-themed color palette with greens and blues, and animate microscopic emoji cells (+) floating in the background. When students complete the quiz, celebrate their achievement with floating leaf emojis () and display a digital “Junior Biologist” badge with science emojis ().

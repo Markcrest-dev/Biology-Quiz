@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biology Quiz for Middle School</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🧬 Biology Quiz 🔬</h1>
+        
+        <div class="difficulty-selector">
+            <button class="difficulty-btn" data-level="easy">Easy 🌱</button>
+            <button class="difficulty-btn" data-level="medium">Medium 🌿</button>
+            <button class="difficulty-btn" data-level="hard">Hard 🌳</button>
+        </div>
+
+        <div class="question-container hidden">
+            <h2 id="question-text"></h2>
+            <div class="options-container" id="options"></div>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-plant" id="progress-plant">🌱</div>
+            <p>Progress: <span id="progress-text">0/10</span></p>
+        </div>
+
+        <div id="result-container" class="hidden">
+            <h2>Congratulations! 🎉</h2>
+            <div class="badge">
+                <p>🧬 Junior Biologist 🔬</p>
+                <p>You're a Science Star! ⭐</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="celebration" id="celebration"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>

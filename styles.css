@@ -1,0 +1,199 @@
+/* Nature-themed color palette */
+:root {
+  --primary-green: #2ecc71;
+  --dark-green: #27ae60;
+  --light-blue: #3498db;
+  --dark-blue: #2980b9;
+  --background: #f0f8ff;
+  --text: #2c3e50;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: var(--background);
+  color: var(--text);
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.container {
+  max-width: 800px;
+  padding: 2rem;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  margin: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.difficulty-selector {
+  margin-bottom: 2rem;
+}
+
+.difficulty-btn {
+  padding: 0.8rem 1.5rem;
+  margin: 0 0.5rem;
+  border: none;
+  border-radius: 25px;
+  background-color: var(--light-blue);
+  color: white;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.difficulty-btn:hover {
+  background-color: var(--dark-blue);
+  transform: scale(1.05);
+}
+
+.difficulty-btn.active {
+  background-color: var(--primary-green);
+}
+
+.question-container {
+  margin: 2rem 0;
+}
+
+.options-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.option-btn {
+  padding: 1rem;
+  border: 2px solid var(--primary-green);
+  border-radius: 10px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.option-btn:hover {
+  background-color: var(--primary-green);
+  color: white;
+}
+
+.progress-container {
+  margin: 2rem 0;
+  position: relative;
+}
+
+.progress-plant {
+  font-size: 2rem;
+  margin: 1rem 0;
+}
+
+.floating-cells-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.floating-cell {
+  position: absolute;
+  font-size: 1.5rem;
+  animation: float linear infinite;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+@keyframes float {
+  0% {
+    transform: translate(-100vw, 0);
+  }
+
+  100% {
+    transform: translate(100vw, 0);
+  }
+}
+
+.celebration div {
+  position: absolute;
+  animation: falling 3s ease-in infinite;
+  font-size: 1.5rem;
+}
+
+@keyframes falling {
+  0% {
+    transform: translateY(-5vh) rotate(0deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(105vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.celebration div {
+  position: absolute;
+  animation: fall 3s linear;
+  font-size: 1.5rem;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(-50px) rotate(0deg);
+  }
+
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+  }
+}
+
+.celebration {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.celebration div {
+  position: absolute;
+  font-size: 2rem;
+  pointer-events: none;
+}
+
+.badge {
+  padding: 2rem;
+  background: linear-gradient(135deg, var(--primary-green), var(--light-blue));
+  border-radius: 50%;
+  color: white;
+  font-size: 1.5rem;
+  margin: 2rem 0;
+  animation: badge-appear 1s ease-out;
+}
+
+@keyframes badge-appear {
+  from {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+}
+
+.hidden {
+  display: none;
+}
