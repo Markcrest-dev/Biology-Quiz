@@ -188,13 +188,41 @@ const quizData = {
   ]
 };
 
+// Shuffle function using Fisher-Yates algorithm
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
 // Game state
 let currentDifficulty = 'easy';
 let currentQuestionIndex = 0;
 let score = 0;
-// Update total questions to show more questions per round
 let totalQuestions = 10;
 let isAnswering = false;
+let currentQuestions = [];
+
+// Initialize game with shuffled questions
+function initGame(difficulty) {
+  currentDifficulty = difficulty;
+  currentQuestionIndex = 0;
+  score = 0;
+  // Shuffle questions for the selected difficulty
+  currentQuestions = [...quizData[difficulty]];
+  shuffleArray(currentQuestions);
+  // Shuffle options for each question
+  currentQuestions.forEach(question => {
+    const correctAnswer = question.options[question.correct];
+    shuffleArray(question.options);
+    // Update correct answer index after shuffling
+    question.correct = question.options.indexOf(correctAnswer);
+  });
+  showQuestion();
+  updateProgress();
+}
 
 // DOM Elements
 const difficultyBtns = document.querySelectorAll('.difficulty-btn');
@@ -227,24 +255,18 @@ function createFloatingCells() {
 
 // Set difficulty level
 function setDifficulty(level) {
-  currentDifficulty = level;
-  currentQuestionIndex = 0;
-  score = 0;
-
+  initGame(level);
   difficultyBtns.forEach(btn => {
     btn.classList.remove('active');
     if (btn.dataset.level === level) btn.classList.add('active');
   });
-
   questionContainer.classList.remove('hidden');
   resultContainer.classList.add('hidden');
-  showQuestion();
-  updateProgress();
 }
 
 // Display current question
 function showQuestion() {
-  const question = quizData[currentDifficulty][currentQuestionIndex];
+  const question = currentQuestions[currentQuestionIndex];
   questionText.innerHTML = `${question.emoji} ${question.question}`;
 
   optionsContainer.innerHTML = '';
@@ -263,7 +285,7 @@ function checkAnswer(selectedIndex) {
   isAnswering = true;
 
   const button = optionsContainer.children[selectedIndex];
-  const correct = quizData[currentDifficulty][currentQuestionIndex].correct === selectedIndex;
+  const correct = currentQuestions[currentQuestionIndex].correct === selectedIndex;
 
   button.style.backgroundColor = correct ? 'var(--primary-green)' : '#ff6b6b';
   button.style.color = 'white';
