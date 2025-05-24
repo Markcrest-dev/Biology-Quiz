@@ -197,3 +197,50 @@ body {
 .hidden {
   display: none;
 }
+
+/* Media Queries for Responsive Design */
+@media screen and (max-width: 768px) {
+  .container {
+    max-width: 95%;
+    padding: 1rem;
+    margin: 1rem;
+  }
+
+  .difficulty-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .difficulty-btn {
+    margin: 0;
+    width: 100%;
+  }
+
+  .options-container {
+    grid-template-columns: 1fr;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .container {
+    margin: 0.5rem;
+    padding: 0.8rem;
+  }
+
+  .badge {
+    padding: 0.8rem;
+  }
+
+  .progress-plant {
+    font-size: 1.5rem;
+  }
+}
