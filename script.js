@@ -339,63 +339,126 @@ const resultsModal = document.getElementById('resultsModal');
 const closeModal = document.querySelector('.close-modal');
 const resultsContainer = document.getElementById('resultsContainer');
 
+// Prevent scrolling on body when modal is open
+function toggleBodyScroll(disable) {
+  if (disable) {
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+  } else {
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.width = '';
+  }
+}
+
+// Handle modal close events
+function closeModalHandler() {
+  resultsModal.classList.remove('show');
+  toggleBodyScroll(false);
+}
+
+closeModal.addEventListener('click', closeModalHandler);
+closeModal.addEventListener('touchend', (e) => {
+  e.preventDefault();
+  closeModalHandler();
+});
+
+// Handle clicks/touches outside modal
+function handleOutsideClick(event) {
+  if (event.target === resultsModal) {
+    closeModalHandler();
+  }
+}
+
+window.addEventListener('click', handleOutsideClick);
+window.addEventListener('touchend', (e) => {
+  handleOutsideClick(e);
+});
+
 viewResultsBtn.addEventListener('click', async () => {
+  toggleBodyScroll(true);
+
   try {
     const response = await fetch('http://localhost:3000/api/quiz-results');
     const data = await response.json();
-    resultsModal.classList.add('show');
+
+    // Clear existing content and create container
+    resultsContainer.innerHTML = '';
+    const resultsList = document.createElement('div');
+    resultsList.className = 'results-list';
 
     if (data.success && data.results.length > 0) {
-      let resultsHTML = '<div class="results-list">';
-
       // Add current session result if available
       if (score !== undefined) {
-        resultsHTML += `
-          <div class="result-item current-session ${score === totalQuestions ? 'perfect-score' : ''}">
-            <h3>Current Session</h3>
-            <div class="result-details">
-              <p class="result-score">Score: ${score}/${totalQuestions}</p>
-              <p class="result-difficulty">${currentDifficulty.charAt(0).toUpperCase() + currentDifficulty.slice(1)} Level</p>
-            </div>
+        const currentSession = document.createElement('div');
+        currentSession.className = `result-item current-session ${score === totalQuestions ? 'perfect-score' : ''}`;
+        currentSession.innerHTML = `
+          <h3>Current Session</h3>
+          <div class="result-details">
+            <p class="result-score">Score: ${score}/${totalQuestions}</p>
+            <p class="result-difficulty">${currentDifficulty.charAt(0).toUpperCase() + currentDifficulty.slice(1)} Level</p>
           </div>
         `;
+        resultsList.appendChild(currentSession);
       }
 
       // Add previous results
       data.results.forEach(result => {
+        const resultItem = document.createElement('div');
         const date = new Date(result.timestamp).toLocaleDateString();
         const time = new Date(result.timestamp).toLocaleTimeString();
-        resultsHTML += `
-          <div class="result-item ${result.score === result.total ? 'perfect-score' : ''}">
-            <h3>${result.difficulty.charAt(0).toUpperCase() + result.difficulty.slice(1)} Level</h3>
-            <div class="result-details">
-              <p class="result-score">Score: ${result.score}/${result.total}</p>
-              <p class="result-timestamp">Completed on ${date} at ${time}</p>
-            </div>
+
+        resultItem.className = `result-item ${result.score === result.total ? 'perfect-score' : ''}`;
+        resultItem.innerHTML = `
+          <h3>${result.difficulty.charAt(0).toUpperCase() + result.difficulty.slice(1)} Level</h3>
+          <div class="result-details">
+            <p class="result-score">Score: ${result.score}/${result.total}</p>
+            <p class="result-timestamp">Completed on ${date} at ${time}</p>
           </div>
         `;
+        resultsList.appendChild(resultItem);
       });
-      resultsHTML += '</div>';
-      resultsContainer.innerHTML = resultsHTML;
+
+      resultsContainer.appendChild(resultsList);
     } else {
-      resultsContainer.innerHTML = '<p>No quiz results found yet. Complete a quiz to see your results!</p>';
+      const message = document.createElement('p');
+      message.textContent = 'No quiz results found yet. Complete a quiz to see your results!';
+      resultsContainer.appendChild(message);
     }
-    resultsModal.style.display = 'block';
+
+    resultsModal.classList.add('show');
+
   } catch (error) {
     console.error('Error fetching results:', error);
-    resultsContainer.innerHTML = '<p>Error loading results. Please try again later.</p>';
+    const errorMessage = document.createElement('p');
+    errorMessage.textContent = 'Error loading results. Please try again later.';
+    resultsContainer.appendChild(errorMessage);
   }
 });
 
 // Close modal when clicking the X button or outside the modal
-closeModal.addEventListener('click', () => {
+function closeModalHandler() {
   resultsModal.classList.remove('show');
+  toggleBodyScroll(false);
+}
+
+closeModal.addEventListener('click', closeModalHandler);
+closeModal.addEventListener('touchend', (e) => {
+  e.preventDefault();
+  closeModalHandler();
 });
 
-window.addEventListener('click', (event) => {
+// Handle clicks/touches outside modal
+function handleOutsideClick(event) {
   if (event.target === resultsModal) {
-    resultsModal.classList.remove('show');
+    closeModalHandler();
   }
+}
+
+window.addEventListener('click', handleOutsideClick);
+window.addEventListener('touchend', (e) => {
+  handleOutsideClick(e);
 });
 
 // Show final results and celebration
