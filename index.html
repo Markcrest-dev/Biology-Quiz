@@ -14,7 +14,7 @@
             <a href="subjects.html" class="back-button">← Back to Subjects</a>
             <h1>🧬 Biology Quiz 🔬</h1>
         </nav>
-        
+
 
         <div class="difficulty-selector">
             <button class="difficulty-btn" data-level="easy">Easy 🌱</button>
@@ -27,9 +27,8 @@
             <h2 id="question-text"></h2>
             <div class="options-container" id="options"></div>
         </div>
-
         <div class="progress-container">
-            <div class="progress-plant" id="progress-plant">🌱</div>
+            <div class="progress-bar" id="progress-bar"></div>
             <p>Progress: <span id="progress-text">0/10</span></p>
         </div>
         <div id="result-container" class="hidden">
@@ -49,8 +48,11 @@
             <div id="resultsContainer"></div>
         </div>
     </div>
-
-    <script src="script.js"></script>
+    <script src="biologyQuizData.js"></script>
+    <script src="subjectQuiz.js"></script>
+    <script>
+        initializeQuiz(biologyQuizData, 'biology');
+    </script>
 </body>
 
 </html>

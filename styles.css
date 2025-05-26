@@ -167,8 +167,12 @@ body {
   position: relative;
 }
 
-.progress-plant {
-  font-size: 2rem;
+.progress-bar {
+  width: 0%;
+  height: 10px;
+  background-color: var(--primary-green);
+  border-radius: 5px;
+  transition: width 0.3s ease;
   margin: 1rem 0;
 }
 
