@@ -339,6 +339,53 @@ async function fetchAndDisplayResults() {
   }
 }
 
+// View Results functionality
+const viewResultsBtn = document.getElementById('viewResults');
+const resultsModal = document.getElementById('resultsModal');
+const closeModal = document.querySelector('.close-modal');
+const resultsContainer = document.getElementById('resultsContainer');
+
+viewResultsBtn.addEventListener('click', async () => {
+  try {
+    const response = await fetch('http://localhost:3000/api/quiz-results');
+    const data = await response.json();
+
+    if (data.success && data.results.length > 0) {
+      let resultsHTML = '<div class="results-list">';
+      data.results.forEach(result => {
+        const date = new Date(result.timestamp).toLocaleDateString();
+        const time = new Date(result.timestamp).toLocaleTimeString();
+        resultsHTML += `
+          <div class="result-item ${result.score === result.total ? 'perfect-score' : ''}">
+            <h3>${result.difficulty.charAt(0).toUpperCase() + result.difficulty.slice(1)} Level</h3>
+            <p>Score: ${result.score}/${result.total}</p>
+            <p class="result-timestamp">Completed on ${date} at ${time}</p>
+          </div>
+        `;
+      });
+      resultsHTML += '</div>';
+      resultsContainer.innerHTML = resultsHTML;
+    } else {
+      resultsContainer.innerHTML = '<p>No quiz results found yet. Complete a quiz to see your results!</p>';
+    }
+    resultsModal.style.display = 'block';
+  } catch (error) {
+    console.error('Error fetching results:', error);
+    resultsContainer.innerHTML = '<p>Error loading results. Please try again later.</p>';
+  }
+});
+
+// Close modal when clicking the X button or outside the modal
+closeModal.addEventListener('click', () => {
+  resultsModal.style.display = 'none';
+});
+
+window.addEventListener('click', (event) => {
+  if (event.target === resultsModal) {
+    resultsModal.style.display = 'none';
+  }
+});
+
 // Show final results and celebration
 function showResults() {
   questionContainer.classList.add('hidden');
