@@ -1,0 +1,20 @@
+{
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "nodemon": "^3.1.10",
+    "sqlite3": "^5.1.7"
+  },
+  "scripts": {
+    "start": "node server.db.js",
+    "dev": "nodemon server.db.js"
+  },
+  "name": "biology-quiz",
+  "version": "1.0.0",
+  "description": "### Create an interactive biology quiz for middle school students that tests knowledge of basic concepts like cell structure, photosynthesis, and animal classification. Use emojis as visual elements throughout the quiz -  for plants,  for cells,  for lab cultures, and  for DNA. Track progress with a growing plant (→→) that develops as students answer correctly. Include three difficulty levels with age-appropriate questions. Use a nature-themed color palette with greens and blues, and animate microscopic emoji cells (+) floating in the background. When students complete the quiz, celebrate their achievement with floating leaf emojis () and display a digital “Junior Biologist” badge with science emojis ().",
+  "main": "script.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

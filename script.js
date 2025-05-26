@@ -313,6 +313,32 @@ function updateProgress() {
   progressText.textContent = `${currentQuestionIndex}/${totalQuestions}`;
 }
 
+// Function to fetch and display quiz results
+async function fetchAndDisplayResults() {
+  try {
+    const response = await fetch('http://localhost:3000/api/quiz-results');
+    const data = await response.json();
+    if (data.success && data.results.length > 0) {
+      const resultsDiv = document.createElement('div');
+      resultsDiv.className = 'quiz-history';
+      resultsDiv.innerHTML = `
+        <h3>🏆 Quiz History</h3>
+        <ul>
+          ${data.results.slice(0, 5).map(result => `
+            <li>
+              Level: ${result.difficulty} - Score: ${result.score}/${result.total}
+              <span class="timestamp">${new Date(result.timestamp).toLocaleDateString()}</span>
+            </li>
+          `).join('')}
+        </ul>
+      `;
+      resultContainer.appendChild(resultsDiv);
+    }
+  } catch (error) {
+    console.error('Error fetching results:', error);
+  }
+}
+
 // Show final results and celebration
 function showResults() {
   questionContainer.classList.add('hidden');
@@ -324,6 +350,24 @@ function showResults() {
   resultText.style.fontSize = '1.5rem';
   resultText.style.marginTop = '1rem';
   resultContainer.insertBefore(resultText, resultContainer.querySelector('.badge'));
+
+  // Check if user has completed this level
+  const completedKey = `completed_${currentDifficulty}`;
+  if (score === totalQuestions && !localStorage.getItem(completedKey)) {
+    localStorage.setItem(completedKey, 'true');
+    sendResultToBackend({
+      difficulty: currentDifficulty,
+      score: score,
+      total: totalQuestions,
+      timestamp: new Date().toISOString()
+    }).then(() => {
+      // Fetch and display updated results after saving
+      fetchAndDisplayResults();
+    });
+  } else {
+    // Always show results, even if not a perfect score
+    fetchAndDisplayResults();
+  }
 
   // Create falling leaves animation
   celebrationContainer.innerHTML = '';
@@ -347,6 +391,25 @@ function showResults() {
     playAgainBtn.onclick = () => setDifficulty(currentDifficulty);
     resultContainer.appendChild(playAgainBtn);
   }, 5000);
+}
+
+// Send result to backend API (replace the URL with your actual endpoint)
+function sendResultToBackend(data) {
+  fetch('http://localhost:3000/api/quiz-result', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+    .then(response => {
+      // Optionally handle response
+      // alert('Result sent!');
+    })
+    .catch(error => {
+      // Optionally handle error
+      // alert('Failed to send result.');
+    });
 }
 
 // Initialize the game when DOM is fully loaded
