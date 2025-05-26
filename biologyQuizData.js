@@ -1,5 +1,4 @@
-// Quiz questions database with emojis
-const quizData = {
+const biologyQuizData = {
   easy: [
     {
       question: "🔬 What is the basic unit of life?",
@@ -188,5 +187,6 @@ const quizData = {
   ]
 };
 
-// Expose quiz data for subjectQuiz.js
-window.biologyQuizData = quizData;
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { biologyQuizData };
+}
