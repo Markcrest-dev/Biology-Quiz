@@ -22,14 +22,14 @@ const transporter = nodemailer.createTransport({
 
 // Endpoint to receive quiz results
 app.post('/api/quiz-result', (req, res) => {
-  const { difficulty, score, total, timestamp } = req.body;
+  const { subject, difficulty, score, total, timestamp } = req.body;
 
   // Compose email
   const mailOptions = {
     from: 'your.email@gmail.com', // sender address
     to: 'destination.email@gmail.com', // receiver address
-    subject: `Quiz Completed: ${difficulty} level`,
-    text: `A user completed the ${difficulty} level with a score of ${score}/${total} at ${timestamp}.`
+    subject: `Quiz Completed: ${subject} - ${difficulty} level`,
+    text: `A user completed the ${subject} quiz at ${difficulty} level with a score of ${score}/${total} at ${timestamp}.`
   };
 
   // Send email

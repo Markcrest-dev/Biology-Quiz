@@ -376,6 +376,47 @@ window.addEventListener('touchend', (e) => {
   handleOutsideClick(e);
 });
 
+// Handle touch events for modal
+let startY = 0;
+let currentY = 0;
+let initialScroll = 0;
+
+function handleTouchStart(e) {
+  startY = e.touches[0].pageY;
+  currentY = startY;
+  initialScroll = this.scrollTop;
+
+  // Only allow dragging if we're at the top of the scroll
+  if (initialScroll <= 0) {
+    this.style.transition = 'none';
+  }
+}
+
+function handleTouchMove(e) {
+  if (initialScroll > 0) return;
+
+  currentY = e.touches[0].pageY;
+  const diff = currentY - startY;
+
+  if (diff > 0) { // Only allow dragging down
+    e.preventDefault();
+    this.style.transform = `translateY(${diff}px)`;
+  }
+}
+
+function handleTouchEnd(e) {
+  if (initialScroll > 0) return;
+
+  this.style.transition = 'transform 0.3s ease-out';
+  const diff = currentY - startY;
+
+  if (diff > 150) { // If dragged down more than 150px, close the modal
+    closeModalHandler();
+  } else {
+    this.style.transform = 'translateY(0)';
+  }
+}
+
 viewResultsBtn.addEventListener('click', async () => {
   toggleBodyScroll(true);
 
@@ -428,13 +469,18 @@ viewResultsBtn.addEventListener('click', async () => {
     }
 
     resultsModal.classList.add('show');
-
   } catch (error) {
     console.error('Error fetching results:', error);
     const errorMessage = document.createElement('p');
     errorMessage.textContent = 'Error loading results. Please try again later.';
     resultsContainer.appendChild(errorMessage);
   }
+
+  // Add touch event listeners for mobile dragging
+  const modalContent = document.querySelector('.modal-content');
+  modalContent.addEventListener('touchstart', handleTouchStart);
+  modalContent.addEventListener('touchmove', handleTouchMove, { passive: false });
+  modalContent.addEventListener('touchend', handleTouchEnd);
 });
 
 // Close modal when clicking the X button or outside the modal
@@ -460,6 +506,45 @@ window.addEventListener('click', handleOutsideClick);
 window.addEventListener('touchend', (e) => {
   handleOutsideClick(e);
 });
+
+// Format results by subject
+function formatResultsBySubject(results) {
+  const subjectResults = {};
+
+  results.forEach(result => {
+    if (!subjectResults[result.subject]) {
+      subjectResults[result.subject] = {
+        easy: [],
+        medium: [],
+        hard: []
+      };
+    }
+    subjectResults[result.subject][result.difficulty].push(result);
+  });
+
+  let html = '';
+  for (const subject in subjectResults) {
+    html += `<div class="subject-results">
+      <h3>${subject.charAt(0).toUpperCase() + subject.slice(1)} Results</h3>`;
+
+    ['easy', 'medium', 'hard'].forEach(difficulty => {
+      const scores = subjectResults[subject][difficulty];
+      if (scores.length > 0) {
+        html += `<div class="difficulty-results">
+          <h4>${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)} Level</h4>
+          <ul>`;
+        scores.forEach(score => {
+          const date = new Date(score.timestamp).toLocaleDateString();
+          html += `<li>Score: ${score.score}/${score.total} (${date})</li>`;
+        });
+        html += `</ul></div>`;
+      }
+    });
+
+    html += `</div>`;
+  }
+  return html;
+}
 
 // Show final results and celebration
 function showResults() {

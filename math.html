@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mathematics Quiz</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="container">
+    <nav class="quiz-nav">
+      <a href="subjects.html" class="back-button">← Back to Subjects</a>
+      <h1>Mathematics Quiz ➗</h1>
+    </nav>
+
+    <div class="difficulty-selector">
+      <button class="difficulty-btn" data-level="easy">Easy 🔢</button>
+      <button class="difficulty-btn" data-level="medium">Medium 📐</button>
+      <button class="difficulty-btn" data-level="hard">Hard 📊</button>
+      <button id="viewResults" class="view-results-btn">View All Results 📈</button>
+    </div>
+
+    <div class="question-container hidden">
+      <h2 id="question-text"></h2>
+      <div class="options-container" id="options"></div>
+    </div>
+
+    <div class="progress-container">
+      <div class="progress-bar" id="progress-bar"></div>
+      <p>Progress: <span id="progress-text">0/10</span></p>
+    </div>
+
+    <div id="result-container" class="hidden">
+      <div class="badge">
+        <p>🎓 Math Master 📊</p>
+        <p>You're a Math Genius! ⭐</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="celebration" id="celebration"></div>
+
+  <div id="resultsModal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2>Quiz Results History 📊</h2>
+      <div id="resultsContainer"></div>
+    </div>
+  </div>
+
+  <script src="mathQuizData.js"></script>
+  <script src="subjectQuiz.js"></script>
+  <script>
+    // Initialize the quiz with math data
+    initializeQuiz(mathQuizData, 'mathematics');
+  </script>
+</body>
+
+</html>

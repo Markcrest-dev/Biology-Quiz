@@ -1,0 +1,249 @@
+.subjects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  padding: clamp(1rem, 3vw, 2rem);
+  max-width: 1400px;
+  margin: 0 auto;
+  overflow-y: auto;
+  max-height: calc(100vh - 100px);
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-green) transparent;
+  position: relative;
+}
+
+.subjects-grid::-webkit-scrollbar {
+  width: 8px;
+}
+
+.subjects-grid::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.subjects-grid::-webkit-scrollbar-thumb {
+  background-color: var(--primary-green);
+  border-radius: 4px;
+}
+
+.subject-card {
+  background: white;
+  border-radius: 15px;
+  padding: clamp(1.5rem, 4vw, 2rem);
+  text-align: center;
+  text-decoration: none;
+  color: var(--text);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  /* height: 100%; */
+  margin: 1rem 0.5rem;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.subject-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.subject-icon {
+  font-size: clamp(2.5rem, 5vw, 3rem);
+  margin-bottom: 1rem;
+}
+
+.subject-card h2 {
+  margin: 1rem 0;
+  color: var(--text);
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
+}
+
+.subject-card p {
+  color: #666;
+  font-size: clamp(0.9rem, 2vw, 1rem);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Subject category styling */
+.subjects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Subject card themes */
+.subject-card.biology,
+.subject-card.chemistry,
+.subject-card.physics {
+  border-left: 4px solid #2ecc71;
+  margin-bottom: 2rem;
+}
+
+.subject-card.math,
+.subject-card.further-maths {
+  border-left: 4px solid #3498db;
+  margin-bottom: 2rem;
+}
+
+.subject-card.english,
+.subject-card.literature {
+  border-left: 4px solid #9b59b6;
+  margin-bottom: 2rem;
+}
+
+.subject-card.computer {
+  border-left: 4px solid #e74c3c;
+  margin-bottom: 2rem;
+}
+
+.subject-card.history,
+.subject-card.religion {
+  border-left: 4px solid #f1c40f;
+  margin-bottom: 2rem;
+}
+
+/* Add subtle category headers */
+.subjects-grid::before {
+  content: "";
+  grid-column: 1 / -1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--primary-green), transparent);
+  margin: 1rem 0;
+}
+
+/* Category visual separators */
+.subjects-grid>a:nth-of-type(3)::after,
+.subjects-grid>a:nth-of-type(5)::after,
+.subjects-grid>a:nth-of-type(7)::after,
+.subjects-grid>a:nth-of-type(8)::after {
+  content: "";
+  position: relative;
+  display: block;
+  width: 80%;
+  height: 2px;
+  margin: 2rem auto;
+  background: linear-gradient(to right, transparent, var(--primary-green), transparent);
+  grid-column: 1 / -1;
+}
+
+/* Add category labels */
+.subjects-grid>a:first-child::before,
+.subjects-grid>a:nth-of-type(4)::before,
+.subjects-grid>a:nth-of-type(6)::before,
+.subjects-grid>a:nth-of-type(8)::before,
+.subjects-grid>a:nth-of-type(9)::before {
+  content: attr(data-category);
+  /* position: absolute; */
+  left: 0;
+  /* margin-top: -2.5rem; */
+  font-size: 1.1rem;
+  color: var(--text);
+  opacity: 0.7;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+  .subjects-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .subject-card {
+    margin: 0.8rem 0.3rem;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .subjects-grid>a:nth-of-type(3)::after,
+  .subjects-grid>a:nth-of-type(5)::after,
+  .subjects-grid>a:nth-of-type(7)::after,
+  .subjects-grid>a:nth-of-type(8)::after {
+    margin: 1.5rem auto;
+    width: 90%;
+  }
+
+  .subjects-grid>a:first-child::before,
+  .subjects-grid>a:nth-of-type(4)::before,
+  .subjects-grid>a:nth-of-type(6)::before,
+  .subjects-grid>a:nth-of-type(8)::before,
+  .subjects-grid>a:nth-of-type(9)::before {
+    margin-top: -2rem;
+    font-size: 1rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .subjects-grid {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+    padding: 0.8rem;
+  }
+
+  .subject-card {
+    margin: 0.5rem 0.2rem;
+    padding-top: 1.2rem;
+    padding-bottom: 1.2rem;
+  }
+
+  .subjects-grid>a:nth-of-type(3)::after,
+  .subjects-grid>a:nth-of-type(5)::after,
+  .subjects-grid>a:nth-of-type(7)::after,
+  .subjects-grid>a:nth-of-type(8)::after {
+    margin: 1rem auto;
+    width: 95%;
+  }
+
+  .subjects-grid>a:first-child::before,
+  .subjects-grid>a:nth-of-type(4)::before,
+  .subjects-grid>a:nth-of-type(6)::before,
+  .subjects-grid>a:nth-of-type(8)::before,
+  .subjects-grid>a:nth-of-type(9)::before {
+    margin-top: -1.8rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Landscape mode adjustments */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+  .subjects-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.5rem;
+    padding: 0.5rem;
+    max-height: calc(100vh - 60px);
+  }
+
+  .subject-card {
+    padding: 0.8rem;
+    min-height: 120px;
+  }
+
+  .subject-icon {
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) {
+  .subject-card {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .subject-card:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+}
+
+/* Container padding adjustments */
+.container {
+  padding: clamp(1rem, 3vw, 2rem);
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
