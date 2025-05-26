@@ -343,6 +343,7 @@ viewResultsBtn.addEventListener('click', async () => {
   try {
     const response = await fetch('http://localhost:3000/api/quiz-results');
     const data = await response.json();
+    resultsModal.classList.add('show');
 
     if (data.success && data.results.length > 0) {
       let resultsHTML = '<div class="results-list">';
@@ -388,12 +389,12 @@ viewResultsBtn.addEventListener('click', async () => {
 
 // Close modal when clicking the X button or outside the modal
 closeModal.addEventListener('click', () => {
-  resultsModal.style.display = 'none';
+  resultsModal.classList.remove('show');
 });
 
 window.addEventListener('click', (event) => {
   if (event.target === resultsModal) {
-    resultsModal.style.display = 'none';
+    resultsModal.classList.remove('show');
   }
 });
 
