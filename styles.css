@@ -336,6 +336,28 @@ body {
   margin-top: 5px;
 }
 
+.result-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.result-score {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--primary-green);
+}
+
+.current-session {
+  border: 2px solid var(--light-blue);
+  background-color: rgba(52, 152, 219, 0.1);
+}
+
+.result-difficulty {
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
 /* Media Queries for Responsive Design */
 @media screen and (max-width: 1024px) {
   .container {
@@ -466,6 +488,7 @@ body {
     padding: 10px;
   }
 }
+
 /* Additional styles for quiz history */
 .quiz-history li:hover {
   background-color: rgba(var(--primary-green-rgb), 0.2);

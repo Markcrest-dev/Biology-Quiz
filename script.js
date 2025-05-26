@@ -313,29 +313,23 @@ function updateProgress() {
   progressText.textContent = `${currentQuestionIndex}/${totalQuestions}`;
 }
 
-// Function to fetch and display quiz results
-async function fetchAndDisplayResults() {
+// Send result to backend API
+async function sendResultToBackend(data) {
   try {
-    const response = await fetch('http://localhost:3000/api/quiz-results');
-    const data = await response.json();
-    if (data.success && data.results.length > 0) {
-      const resultsDiv = document.createElement('div');
-      resultsDiv.className = 'quiz-history';
-      resultsDiv.innerHTML = `
-        <h3>🏆 Quiz History</h3>
-        <ul>
-          ${data.results.slice(0, 5).map(result => `
-            <li>
-              Level: ${result.difficulty} - Score: ${result.score}/${result.total}
-              <span class="timestamp">${new Date(result.timestamp).toLocaleDateString()}</span>
-            </li>
-          `).join('')}
-        </ul>
-      `;
-      resultContainer.appendChild(resultsDiv);
+    const response = await fetch('http://localhost:3000/api/quiz-result', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+    const result = await response.json();
+    if (result.success) {
+      // After successfully sending the result, automatically open the results modal
+      viewResultsBtn.click();
     }
   } catch (error) {
-    console.error('Error fetching results:', error);
+    console.error('Error sending result:', error);
   }
 }
 
@@ -352,14 +346,31 @@ viewResultsBtn.addEventListener('click', async () => {
 
     if (data.success && data.results.length > 0) {
       let resultsHTML = '<div class="results-list">';
+
+      // Add current session result if available
+      if (score !== undefined) {
+        resultsHTML += `
+          <div class="result-item current-session ${score === totalQuestions ? 'perfect-score' : ''}">
+            <h3>Current Session</h3>
+            <div class="result-details">
+              <p class="result-score">Score: ${score}/${totalQuestions}</p>
+              <p class="result-difficulty">${currentDifficulty.charAt(0).toUpperCase() + currentDifficulty.slice(1)} Level</p>
+            </div>
+          </div>
+        `;
+      }
+
+      // Add previous results
       data.results.forEach(result => {
         const date = new Date(result.timestamp).toLocaleDateString();
         const time = new Date(result.timestamp).toLocaleTimeString();
         resultsHTML += `
           <div class="result-item ${result.score === result.total ? 'perfect-score' : ''}">
             <h3>${result.difficulty.charAt(0).toUpperCase() + result.difficulty.slice(1)} Level</h3>
-            <p>Score: ${result.score}/${result.total}</p>
-            <p class="result-timestamp">Completed on ${date} at ${time}</p>
+            <div class="result-details">
+              <p class="result-score">Score: ${result.score}/${result.total}</p>
+              <p class="result-timestamp">Completed on ${date} at ${time}</p>
+            </div>
           </div>
         `;
       });
@@ -388,33 +399,21 @@ window.addEventListener('click', (event) => {
 
 // Show final results and celebration
 function showResults() {
-  questionContainer.classList.add('hidden');
-  resultContainer.classList.remove('hidden');
+  questionContainer.classList.add('hidden'); resultContainer.classList.remove('hidden');
 
-  // Update result text
-  const resultText = document.createElement('p');
-  resultText.textContent = `You got ${score} out of ${totalQuestions} correct!`;
-  resultText.style.fontSize = '1.5rem';
-  resultText.style.marginTop = '1rem';
-  resultContainer.insertBefore(resultText, resultContainer.querySelector('.badge'));
-
-  // Check if user has completed this level
+  // Check if user has completed this level and send result
   const completedKey = `completed_${currentDifficulty}`;
   if (score === totalQuestions && !localStorage.getItem(completedKey)) {
     localStorage.setItem(completedKey, 'true');
-    sendResultToBackend({
-      difficulty: currentDifficulty,
-      score: score,
-      total: totalQuestions,
-      timestamp: new Date().toISOString()
-    }).then(() => {
-      // Fetch and display updated results after saving
-      fetchAndDisplayResults();
-    });
-  } else {
-    // Always show results, even if not a perfect score
-    fetchAndDisplayResults();
   }
+
+  // Always send the result to backend
+  sendResultToBackend({
+    difficulty: currentDifficulty,
+    score: score,
+    total: totalQuestions,
+    timestamp: new Date().toISOString()
+  });
 
   // Create falling leaves animation
   celebrationContainer.innerHTML = '';
@@ -440,24 +439,7 @@ function showResults() {
   }, 5000);
 }
 
-// Send result to backend API (replace the URL with your actual endpoint)
-function sendResultToBackend(data) {
-  fetch('http://localhost:3000/api/quiz-result', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data)
-  })
-    .then(response => {
-      // Optionally handle response
-      // alert('Result sent!');
-    })
-    .catch(error => {
-      // Optionally handle error
-      // alert('Failed to send result.');
-    });
-}
+// This function has been moved up and rewritten as async function
 
 // Initialize the game when DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
