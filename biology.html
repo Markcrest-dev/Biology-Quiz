@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Biology Quiz</title>
+    <title>Biology Quiz - Educational Hub</title>
+    <meta name="description" content="Test your biology knowledge with our interactive quiz">
     <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -14,6 +15,7 @@
             <a href="subjects.html" class="back-button">← Back to Subjects</a>
             <h1>🧬 Biology Quiz 🔬</h1>
         </nav>
+
         <div class="difficulty-selector">
             <button class="difficulty-btn" data-level="easy">Easy 🌱</button>
             <button class="difficulty-btn" data-level="medium">Medium 🌿</button>
@@ -29,6 +31,7 @@
                 <button id="nextQuestion" class="nav-btn">Next →</button>
             </div>
         </div>
+
         <div class="progress-container">
             <div class="progress-bar" id="progress-bar"></div>
             <p>Progress: <span id="progress-text">0/10</span></p>
@@ -39,27 +42,15 @@
                 <p>🧬 Junior Biologist 🔬</p>
                 <p>You're a Science Star! ⭐</p>
             </div>
-            <div class="results-section">
-                <button id="viewResults" class="view-results-btn">
-                    <span class="btn-icon">📊</span>
-                    <span class="btn-text">View Quiz History</span>
-                </button>
-            </div>
         </div>
     </div>
 
     <div class="celebration" id="celebration"></div>
 
-    <div id="resultsModal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>Quiz Results History 📊</h2>
-            <div id="resultsContainer"></div>
-        </div>
-    </div>
     <script src="biologyQuizData.js"></script>
     <script src="subjectQuiz.js"></script>
     <script>
+        // Initialize the quiz with biology data
         initializeQuiz(biologyQuizData, 'biology');
     </script>
 </body>

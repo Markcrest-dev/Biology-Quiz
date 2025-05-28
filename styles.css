@@ -8,9 +8,14 @@
   --text: #2c3e50;
   --light-bg: #ffffff;
   --primary-color: #2ecc71;
+  /* Alias for primary-green */
   --secondary-color: #3498db;
+  /* Alias for light-blue */
   --text-color: #2c3e50;
+  /* Alias for text */
   --lighter-bg: #f9f9f9;
+  --primary-green-rgb: 46, 204, 113;
+  /* RGB values for rgba usage */
 }
 
 body {
@@ -155,8 +160,7 @@ body {
   -moz-appearance: none;
   appearance: none;
   outline: none;
-  /* Prevent iOS zoom on double tap */
-  -webkit-user-zoom: none;
+  /* Prevent iOS zoom on double tap - handled by viewport meta tag */
   /* Improve touch responsiveness */
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
@@ -438,17 +442,61 @@ body {
   background-color: var(--primary-green);
 }
 
-/* Results Modal Styles */
+/* Finish Quiz Button Styles */
+.finish-btn {
+  background: linear-gradient(135deg, var(--primary-green), var(--dark-green)) !important;
+  color: white !important;
+  font-weight: bold !important;
+  font-size: 1.1rem !important;
+  padding: 1rem 2rem !important;
+  margin: 1.5rem auto !important;
+  display: block !important;
+  width: fit-content !important;
+  min-width: 250px !important;
+  border-radius: 30px !important;
+  box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+  animation: pulse 2s infinite;
+  transition: all 0.3s ease;
+}
+
+.finish-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
+  background: linear-gradient(135deg, var(--dark-green), var(--primary-green)) !important;
+}
+
+.finish-btn:active {
+  transform: translateY(0) scale(1);
+  box-shadow: 0 2px 10px rgba(46, 204, 113, 0.3);
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 4px 20px rgba(46, 204, 113, 0.5);
+  }
+
+  100% {
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+  }
+}
+
+/* Results Modal Styles - DISABLED */
 #resultsModal {
-  display: none;
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.8);
-  z-index: 9999;
-  opacity: 0;
+  z-index: -1;
   transition: opacity 0.3s ease-out;
   padding: 20px;
 }
@@ -785,6 +833,13 @@ body {
     padding: 0.8rem;
   }
 
+  .finish-btn {
+    min-width: 100% !important;
+    font-size: 1rem !important;
+    padding: 1rem !important;
+    margin: 1rem auto !important;
+  }
+
   .badge {
     padding: 1.5rem;
     font-size: 1.2rem;
@@ -924,4 +979,17 @@ body {
   .modal-content {
     animation: none;
   }
+}
+
+/* Hide View Results Button - Modal Disabled */
+.view-results-btn {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Hide Results Section if it only contains the disabled button */
+.results-section:has(.view-results-btn:only-child) {
+  display: none !important;
 }

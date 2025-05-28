@@ -11,7 +11,7 @@ function initializeQuiz(quizData, subject) {
   let skippedQuestions = []; // Track skipped questions
   let quizResults = []; // Track quiz results for the session
 
-  // DOM Elements
+  // DOM Elements with error checking
   const difficultyBtns = document.querySelectorAll('.difficulty-btn');
   const questionContainer = document.querySelector('.question-container');
   const questionText = document.getElementById('question-text');
@@ -26,24 +26,67 @@ function initializeQuiz(quizData, subject) {
   const viewResultsBtn = document.getElementById('viewResults');
   const resultsContainer = document.getElementById('resultsContainer');
 
-  // Navigation button states
-  function updateNavigationButtons() {
-    prevButton.disabled = currentQuestionIndex === 0;
-    nextButton.disabled = currentQuestionIndex === totalQuestions - 1;
-    skipButton.disabled = answeredQuestions.has(currentQuestionIndex);
+  // Validate critical DOM elements
+  if (!questionContainer || !resultContainer || !questionText || !optionsContainer) {
+    console.error('Critical DOM elements missing. Please check HTML structure.');
+    return;
   }
 
-  // Validate quiz data
+  // Validate quiz data structure
   function validateQuizData(data, difficulty) {
-    if (!data || !data[difficulty] || !Array.isArray(data[difficulty])) {
-      console.error(`Invalid quiz data for ${difficulty} difficulty`);
+    try {
+      if (!data || typeof data !== 'object') {
+        console.error('Quiz data is not available or invalid');
+        return false;
+      }
+
+      if (!data[difficulty] || !Array.isArray(data[difficulty])) {
+        console.error(`No questions found for difficulty: ${difficulty}`);
+        return false;
+      }
+
+      const questions = data[difficulty];
+      if (questions.length === 0) {
+        console.error(`Empty question array for difficulty: ${difficulty}`);
+        return false;
+      }
+
+      // Validate each question structure
+      const validQuestions = questions.filter(q =>
+        q &&
+        typeof q.question === 'string' &&
+        q.question.trim().length > 0 &&
+        Array.isArray(q.options) &&
+        q.options.length >= 2 &&
+        q.options.every(opt => typeof opt === 'string' && opt.trim().length > 0) &&
+        typeof q.correct === 'number' &&
+        q.correct >= 0 &&
+        q.correct < q.options.length
+      );
+
+      if (validQuestions.length === 0) {
+        console.error(`No valid questions found for difficulty: ${difficulty}`);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error validating quiz data:', error);
       return false;
     }
-    if (data[difficulty].length < totalQuestions) {
-      console.error(`Not enough questions for ${difficulty} difficulty`);
-      return false;
+  }
+
+  // Navigation button states
+  function updateNavigationButtons() {
+    if (prevButton) {
+      prevButton.disabled = currentQuestionIndex === 0;
     }
-    return true;
+    if (nextButton) {
+      nextButton.disabled = currentQuestionIndex === totalQuestions - 1;
+    }
+    if (skipButton) {
+      skipButton.disabled = answeredQuestions.has(currentQuestionIndex);
+    }
   }
 
   // Initialize game with validated data
@@ -86,6 +129,12 @@ function initializeQuiz(quizData, subject) {
   // Set difficulty level
   function setDifficulty(level) {
     if (initGame(level)) {
+      // Clean up any existing finish button
+      const existingFinishBtn = document.getElementById('finishQuiz');
+      if (existingFinishBtn) {
+        existingFinishBtn.remove();
+      }
+
       difficultyBtns.forEach(btn => {
         btn.classList.remove('active');
         if (btn.dataset.level === level) btn.classList.add('active');
@@ -97,9 +146,15 @@ function initializeQuiz(quizData, subject) {
 
   // Show current question
   function showQuestion() {
+    // Remove any existing finish button when navigating between questions
+    const existingFinishBtn = document.getElementById('finishQuiz');
+    if (existingFinishBtn) {
+      existingFinishBtn.remove();
+    }
+
     if (currentQuestionIndex >= currentQuestions.length) {
-      showResults();
-      return;
+      // If we've gone past the last question, go back to the last question
+      currentQuestionIndex = totalQuestions - 1;
     }
     const question = currentQuestions[currentQuestionIndex];
     // Handle both question formats (with and without emojis)
@@ -205,15 +260,12 @@ function initializeQuiz(quizData, subject) {
 
     setTimeout(() => {
       isAnswering = false;
-      if (currentQuestionIndex < totalQuestions - 1 && !skippedQuestions.length) {
-        currentQuestionIndex++;
-        showQuestion();
-        updateProgress();
-      } else if (answeredQuestions.size === totalQuestions) {
-        showResults();
-      } else {
-        showQuestion();
-        updateProgress();
+      updateProgress();
+      updateNavigationButtons();
+
+      // Check if all questions have been answered
+      if (answeredQuestions.size === totalQuestions) {
+        showFinishButton();
       }
     }, 1000);
   }
@@ -223,21 +275,63 @@ function initializeQuiz(quizData, subject) {
     const progress = (answeredQuestions.size / totalQuestions) * 100;
     progressBar.style.width = `${progress}%`;
     progressText.textContent = `${answeredQuestions.size}/${totalQuestions}`;
-  }    // Store results locally if server is unavailable
-  function saveLocalResult(data) {
+  }
+
+  // Show finish button when all questions are answered
+  function showFinishButton() {
+    const existingFinishBtn = document.getElementById('finishQuiz');
+    if (existingFinishBtn) {
+      existingFinishBtn.remove();
+    }
+
+    const finishButton = document.createElement('button');
+    finishButton.id = 'finishQuiz';
+    finishButton.className = 'nav-btn finish-btn';
+    finishButton.innerHTML = '🏁 Finish Quiz & View Results';
+    finishButton.style.background = 'linear-gradient(135deg, var(--primary-green), var(--dark-green))';
+    finishButton.style.color = 'white';
+    finishButton.style.fontWeight = 'bold';
+    finishButton.style.fontSize = '1.1rem';
+    finishButton.style.padding = '1rem 2rem';
+    finishButton.style.margin = '1rem auto';
+    finishButton.style.display = 'block';
+    finishButton.style.width = 'fit-content';
+    finishButton.style.minWidth = '250px';
+
+    finishButton.addEventListener('click', () => {
+      showResults();
+    });
+
+    // Add the button after the navigation buttons
+    const navigationButtons = document.querySelector('.navigation-buttons');
+    if (navigationButtons) {
+      navigationButtons.parentNode.insertBefore(finishButton, navigationButtons.nextSibling);
+    } else {
+      // Fallback: add to question container
+      questionContainer.appendChild(finishButton);
+    }
+  }
+
+  // Save result to localStorage with error handling
+  function saveLocalResult(resultData) {
     try {
-      let localResults = JSON.parse(localStorage.getItem('quizResults') || '[]');
-      const newResult = {
-        ...data,
-        id: Date.now(),
-        timestamp: new Date().toISOString()
-      };
-      console.log('Saving result:', newResult); // Debug log
-      localResults.push(newResult);
-      localStorage.setItem('quizResults', JSON.stringify(localResults));
+      if (!resultData || typeof resultData !== 'object') {
+        console.error('Invalid result data provided to saveLocalResult');
+        return false;
+      }
+
+      const results = JSON.parse(localStorage.getItem('quizResults') || '[]');
+      results.push({
+        ...resultData,
+        id: Date.now() + Math.random(), // Add unique ID
+        timestamp: resultData.timestamp || new Date().toISOString()
+      });
+
+      localStorage.setItem('quizResults', JSON.stringify(results));
+      console.log('Result saved successfully to localStorage');
       return true;
     } catch (error) {
-      console.error('Error saving to local storage:', error);
+      console.error('Error saving result to localStorage:', error);
       return false;
     }
   }
@@ -251,8 +345,16 @@ function initializeQuiz(quizData, subject) {
       console.error('Error reading from local storage:', error);
       return [];
     }
-  }  // Display results in modal
+  }
+
+  // Display results in modal (DISABLED)
   function displayResults(results = []) {
+    // Modal functionality has been disabled
+    console.log('Results modal is disabled');
+    return;
+
+    // The following code is commented out to disable the modal
+    /*
     const resultsContainer = document.getElementById('resultsContainer');
     const modal = document.getElementById('resultsModal');
 
@@ -270,6 +372,7 @@ function initializeQuiz(quizData, subject) {
       medium: allResults.filter(r => r.difficulty === 'medium'),
       hard: allResults.filter(r => r.difficulty === 'hard')
     };
+    */
 
     // Calculate statistics
     const calculateStats = (results) => {
@@ -354,7 +457,9 @@ function initializeQuiz(quizData, subject) {
     modal.style.display = 'block';
     modal.offsetHeight; // Force a reflow
     modal.classList.add('visible');
-  }    // Send result to backend
+  }
+
+  // Send result to backend
   async function sendResultToBackend(data) {
     try {
       const response = await fetch('http://localhost:3000/api/quiz-result', {
@@ -420,7 +525,6 @@ function initializeQuiz(quizData, subject) {
         </div>
       </div>
       <div class="result-actions">
-        <button class="view-history-btn">📊 View All Results History</button>
         <button class="play-again-btn" onclick="setDifficulty('${currentDifficulty}')">🔄 Play Again</button>
       </div>
     `;
@@ -433,13 +537,7 @@ function initializeQuiz(quizData, subject) {
       resultContainer.appendChild(resultSummary);
     }
 
-    // Add click handler for view history button
-    const viewHistoryBtn = resultSummary.querySelector('.view-history-btn');
-    if (viewHistoryBtn) {
-      viewHistoryBtn.addEventListener('click', () => {
-        displayResults();
-      });
-    }
+    // View history button removed - modal functionality disabled
 
     // Start celebration animation
     celebrateSuccess();
@@ -542,12 +640,15 @@ function initializeQuiz(quizData, subject) {
     // Initial setup
     setDifficulty('easy');
 
-    // Handle view results button
+    // Handle view results button (DISABLED)
     if (viewResultsBtn) {
       viewResultsBtn.addEventListener('click', () => {
-        displayResults();
+        console.log('Results modal is disabled');
+        // displayResults(); // Commented out to disable modal
       });
-    }    // Handle modal close button and outside click
+    }
+
+    // Handle modal close button and outside click
     function closeModal() {
       const modal = document.getElementById('resultsModal');
       if (modal) {
@@ -597,14 +698,12 @@ function initializeQuiz(quizData, subject) {
       skipButton.addEventListener('click', () => {
         if (!answeredQuestions.has(currentQuestionIndex)) {
           skippedQuestions.push(currentQuestionIndex);
-          if (currentQuestionIndex < totalQuestions - 1) {
-            currentQuestionIndex++;
-            showQuestion();
-            updateProgress();
-          } else if (skippedQuestions.length > 0) {
-            currentQuestionIndex = skippedQuestions[0];
-            skippedQuestions.shift();
-            showQuestion();
+          updateProgress();
+          updateNavigationButtons();
+
+          // Show finish button if all questions have been answered or skipped
+          if (answeredQuestions.size + skippedQuestions.length === totalQuestions) {
+            showFinishButton();
           }
         }
       });
