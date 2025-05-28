@@ -127,8 +127,9 @@ body {
 }
 
 .option-btn {
-  min-height: 44px;
-  padding: clamp(0.8rem, 2vw, 1.2rem);
+  min-height: 48px;
+  /* Increased touch target */
+  padding: clamp(1rem, 2vw, 1.5rem);
   font-size: clamp(0.9rem, 2vw, 1rem);
   border: 2px solid var(--primary-green);
   border-radius: 8px;
@@ -143,6 +144,12 @@ body {
   word-break: break-word;
   hyphens: auto;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  position: relative;
+  z-index: 1;
 }
 
 .option-btn:hover {
@@ -150,14 +157,23 @@ body {
   color: white;
 }
 
-/* Active state for touch devices */
-.option-btn:active {
-  transform: scale(0.98);
-  background: var(--dark-green);
-  color: white;
+/* Touch device styles */
+@media (hover: none) {
+  .option-btn {
+    min-height: 54px;
+    /* Even larger touch target for touch devices */
+    margin-bottom: 8px;
+    /* Add space between options */
+  }
+
+  .option-btn:active {
+    transform: scale(0.98);
+    background: var(--dark-green);
+    color: white;
+  }
 }
 
-/* Ensure buttons are easily tappable on mobile */
+/* Mobile styles */
 @media (max-width: 768px) {
   .option-btn {
     width: 100%;
