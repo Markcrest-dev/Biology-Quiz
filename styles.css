@@ -150,6 +150,16 @@ body {
   -webkit-touch-callout: none;
   position: relative;
   z-index: 1;
+  /* Enhanced mobile touch support */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  outline: none;
+  /* Prevent iOS zoom on double tap */
+  -webkit-user-zoom: none;
+  /* Improve touch responsiveness */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
 
 .option-btn:hover {
@@ -164,12 +174,22 @@ body {
     /* Even larger touch target for touch devices */
     margin-bottom: 8px;
     /* Add space between options */
+    /* Enhanced touch responsiveness */
+    -webkit-tap-highlight-color: rgba(46, 204, 113, 0.3);
   }
 
   .option-btn:active {
     transform: scale(0.98);
     background: var(--dark-green);
     color: white;
+    /* Immediate visual feedback */
+    transition: all 0.1s ease;
+  }
+
+  /* Ensure touch events work properly */
+  .option-btn:focus {
+    outline: 2px solid var(--primary-green);
+    outline-offset: 2px;
   }
 }
 
@@ -640,6 +660,62 @@ body {
   font-size: 1.1rem;
 }
 
+.score-message {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: linear-gradient(135deg, var(--primary-green), var(--light-blue));
+  border-radius: 10px;
+  color: white;
+  font-weight: bold;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.result-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.result-actions button {
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 25px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.result-actions .view-history-btn {
+  background: var(--light-blue);
+  color: white;
+}
+
+.result-actions .view-history-btn:hover {
+  background: var(--dark-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.result-actions .play-again-btn {
+  background: var(--primary-green);
+  color: white;
+}
+
+.result-actions .play-again-btn:hover {
+  background: var(--dark-green);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
 .view-history-btn {
   background: var(--light-blue);
   color: white;
@@ -691,6 +767,22 @@ body {
     padding: 1rem;
     font-size: 1rem;
     min-height: 48px;
+  }
+
+  .result-actions {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .result-actions button {
+    min-width: 100%;
+    padding: 1rem;
+    font-size: 1rem;
+  }
+
+  .score-message {
+    font-size: 1rem;
+    padding: 0.8rem;
   }
 
   .badge {

@@ -110,14 +110,70 @@ function initializeQuiz(quizData, subject) {
       const button = document.createElement('button');
       button.className = 'option-btn';
       button.textContent = option;
+
+      // Add mobile-friendly attributes
+      button.setAttribute('type', 'button');
+      button.setAttribute('role', 'button');
+      button.setAttribute('tabindex', '0');
+
       if (answeredQuestions.has(currentQuestionIndex)) {
         button.disabled = true;
+        button.setAttribute('aria-disabled', 'true');
         if (index === question.correct) {
           button.style.backgroundColor = 'var(--primary-green)';
           button.style.color = 'white';
         }
       } else {
-        button.onclick = () => checkAnswer(index);
+        // Enhanced mobile event handling
+        const handleAnswer = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (!button.disabled && !isAnswering) {
+            checkAnswer(index);
+          }
+        };
+
+        // Add multiple event listeners for better mobile support
+        button.addEventListener('click', handleAnswer, { passive: false });
+        button.addEventListener('touchend', handleAnswer, { passive: false });
+
+        // Add visual feedback for touch
+        button.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          button.style.transform = 'scale(0.98)';
+          button.style.backgroundColor = 'var(--dark-green)';
+          button.style.color = 'white';
+        }, { passive: false });
+
+        button.addEventListener('touchcancel', () => {
+          button.style.transform = '';
+          button.style.backgroundColor = '';
+          button.style.color = '';
+        });
+
+        // Reset styles when touch moves away from button
+        button.addEventListener('touchleave', () => {
+          button.style.transform = '';
+          button.style.backgroundColor = '';
+          button.style.color = '';
+        });
+
+        // Also reset on mouse leave for hybrid devices
+        button.addEventListener('mouseleave', () => {
+          if (!button.disabled) {
+            button.style.transform = '';
+            button.style.backgroundColor = '';
+            button.style.color = '';
+          }
+        });
+
+        // Keyboard accessibility
+        button.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleAnswer(e);
+          }
+        });
       }
       optionsContainer.appendChild(button);
     });
@@ -132,8 +188,17 @@ function initializeQuiz(quizData, subject) {
     const button = optionsContainer.children[selectedIndex];
     const correct = currentQuestions[currentQuestionIndex].correct === selectedIndex;
 
+    // Disable all option buttons to prevent multiple selections
+    Array.from(optionsContainer.children).forEach(btn => {
+      btn.disabled = true;
+      btn.style.pointerEvents = 'none';
+    });
+
     button.style.backgroundColor = correct ? 'var(--primary-green)' : '#ff6b6b';
     button.style.color = 'white';
+
+    // Reset any touch transforms
+    button.style.transform = '';
 
     if (correct) score++;
     answeredQuestions.add(currentQuestionIndex);
@@ -305,23 +370,20 @@ function initializeQuiz(quizData, subject) {
 
       const result = await response.json();
       if (result.success) {
-        console.log('Results received from server:', result.results); // Debug log
-        displayResults(result.results);
+        console.log('Result successfully sent to server:', result);
+        // Update local storage with server response if needed
+        return result;
       }
     } catch (error) {
       console.error('Error sending result to server:', error);
-      // Save locally if server is unavailable
-      if (saveLocalResult({
-        ...data,
-        subject: subject
-      })) {
-        displayResults();
-      }
+      // Server is unavailable, but we already saved locally
+      return null;
     }
   }
 
   // Show final results
   function showResults() {
+    // Hide question container and show result container
     questionContainer.classList.add('hidden');
     resultContainer.classList.remove('hidden');
 
@@ -331,6 +393,10 @@ function initializeQuiz(quizData, subject) {
       total: totalQuestions,
       timestamp: new Date().toISOString()
     };
+
+    // Clear any existing result summaries to prevent duplicates
+    const existingSummaries = resultContainer.querySelectorAll('.result-summary, .quiz-summary');
+    existingSummaries.forEach(summary => summary.remove());
 
     // Create and show the immediate result summary
     const percentage = Math.round((score / totalQuestions) * 100);
@@ -344,62 +410,58 @@ function initializeQuiz(quizData, subject) {
           <div class="percentage">${percentage}%</div>
         </div>
         <div class="result-info">
-          <p>Difficulty: ${currentDifficulty.charAt(0).toUpperCase() + currentDifficulty.slice(1)}</p>
-          <p>Date: ${new Date().toLocaleDateString()}</p>
-          <p>Time: ${new Date().toLocaleTimeString()}</p>
+          <p><strong>Subject:</strong> ${subject.charAt(0).toUpperCase() + subject.slice(1)}</p>
+          <p><strong>Difficulty:</strong> ${currentDifficulty.charAt(0).toUpperCase() + currentDifficulty.slice(1)}</p>
+          <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+          <p><strong>Time:</strong> ${new Date().toLocaleTimeString()}</p>
+        </div>
+        <div class="score-message">
+          <p>${getScoreMessage(percentage)}</p>
         </div>
       </div>
-      <button class="view-history-btn">View All Results History 📊</button>
+      <div class="result-actions">
+        <button class="view-history-btn">📊 View All Results History</button>
+        <button class="play-again-btn" onclick="setDifficulty('${currentDifficulty}')">🔄 Play Again</button>
+      </div>
     `;
 
     // Add the summary before the badge
     const badge = resultContainer.querySelector('.badge');
-    resultContainer.insertBefore(resultSummary, badge);
+    if (badge) {
+      resultContainer.insertBefore(resultSummary, badge);
+    } else {
+      resultContainer.appendChild(resultSummary);
+    }
 
     // Add click handler for view history button
     const viewHistoryBtn = resultSummary.querySelector('.view-history-btn');
-    viewHistoryBtn.addEventListener('click', () => {
-      displayResults();
-    });
+    if (viewHistoryBtn) {
+      viewHistoryBtn.addEventListener('click', () => {
+        displayResults();
+      });
+    }
 
-    sendResultToBackend(resultData);
+    // Start celebration animation
     celebrateSuccess();
+
+    // Save result and handle backend communication
+    saveAndDisplayResult(resultData);
   }
 
-  // Show immediate results after quiz completion
-  function showQuizSummary(resultData) {
-    const { score, total, difficulty } = resultData;
-    const percentage = Math.round((score / total) * 100);
+  // Save result and handle display
+  function saveAndDisplayResult(resultData) {
+    // Always save locally first
+    const saved = saveLocalResult({
+      ...resultData,
+      subject: subject
+    });
 
-    // Create summary element with enhanced styling
-    const summaryHTML = `
-      <div class="quiz-summary">
-        <div class="summary-header">
-          <h2>Quiz Complete! 🎉</h2>
-          <div class="final-score">
-            <span class="score-number">${score}/${total}</span>
-            <span class="score-percentage">${percentage}%</span>
-            <p class="score-message">${getScoreMessage(percentage)}</p>
-          </div>
-        </div>
-        <div class="summary-details">
-          <p><strong>Subject:</strong> ${subject.charAt(0).toUpperCase() + subject.slice(1)}</p>
-          <p><strong>Difficulty:</strong> ${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}</p>
-          <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-          <p><strong>Time:</strong> ${new Date().toLocaleTimeString()}</p>
-        </div>
-        <div class="summary-buttons">
-          <button onclick="window.viewResults()" class="view-history-btn">View All Results 📊</button>
-          <button onclick="setDifficulty('${difficulty}')" class="play-again-btn">Play Again 🔄</button>
-        </div>
-      </div>
-    `;
+    if (saved) {
+      console.log('Result saved locally:', resultData);
+    }
 
-    // Insert before the badge
-    const badge = resultContainer.querySelector('.badge');
-    const summaryDiv = document.createElement('div');
-    summaryDiv.innerHTML = summaryHTML;
-    resultContainer.insertBefore(summaryDiv, badge);
+    // Try to send to backend (if available)
+    sendResultToBackend(resultData);
   }
 
   // Helper function to get a message based on score percentage
@@ -414,25 +476,37 @@ function initializeQuiz(quizData, subject) {
 
   // Celebration animation
   function celebrateSuccess() {
+    if (!celebrationContainer) {
+      console.error('Celebration container not found');
+      return;
+    }
+
     celebrationContainer.innerHTML = '';
+    celebrationContainer.style.display = 'block';
+    celebrationContainer.style.pointerEvents = 'none';
+
     const emojis = getSubjectEmojis(subject);
 
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 30; i++) {
       const element = document.createElement('div');
       element.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      element.style.position = 'absolute';
       element.style.left = `${Math.random() * 100}%`;
-      element.style.animationDuration = `${Math.random() * 2 + 1}s`;
-      element.style.animationDelay = `${Math.random()}s`;
+      element.style.top = '-50px';
+      element.style.fontSize = '2rem';
+      element.style.zIndex = '1000';
+      element.style.pointerEvents = 'none';
+      element.style.animation = `fall ${Math.random() * 2 + 2}s linear forwards`;
+      element.style.animationDelay = `${Math.random() * 2}s`;
       celebrationContainer.appendChild(element);
     }
 
+    // Clear celebration after animation completes
     setTimeout(() => {
-      celebrationContainer.innerHTML = '';
-      const playAgainBtn = document.createElement('button');
-      playAgainBtn.textContent = 'Play Again 🔄';
-      playAgainBtn.className = 'difficulty-btn';
-      playAgainBtn.onclick = () => setDifficulty(currentDifficulty);
-      resultContainer.appendChild(playAgainBtn);
+      if (celebrationContainer) {
+        celebrationContainer.innerHTML = '';
+        celebrationContainer.style.display = 'none';
+      }
     }, 5000);
   }
 
@@ -471,11 +545,7 @@ function initializeQuiz(quizData, subject) {
     // Handle view results button
     if (viewResultsBtn) {
       viewResultsBtn.addEventListener('click', () => {
-        const modal = document.getElementById('resultsModal');
-        if (modal) {
-          modal.style.display = 'block';
-          displayResults();
-        }
+        displayResults();
       });
     }    // Handle modal close button and outside click
     function closeModal() {
@@ -540,6 +610,10 @@ function initializeQuiz(quizData, subject) {
       });
     }
   }
+
+  // Make displayResults globally accessible for button onclick handlers
+  window.displayResults = displayResults;
+  window.setDifficulty = setDifficulty;
 
   // Start initialization
   initializeInterface();
