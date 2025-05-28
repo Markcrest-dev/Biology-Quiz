@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<div class="difficulty-selector">
+  <button class="difficulty-btn" data-level="easy">Easy 🕊️</button>
+  <button class="difficulty-btn" data-level="medium">Medium 🙏</button>
+  <button class="difficulty-btn" data-level="hard">Hard ⛪</button>
+</div>lang="en">
 
 <head>
   <meta charset="UTF-8">
@@ -36,11 +40,16 @@
       <div class="progress-bar" id="progress-bar"></div>
       <p>Progress: <span id="progress-text">0/10</span></p>
     </div>
-
     <div id="result-container" class="hidden">
       <div class="badge">
         <p>✝️ Biblical Scholar 📖</p>
         <p>You're a Religious Studies Star! ⭐</p>
+      </div>
+      <div class="results-section">
+        <button id="viewResults" class="view-results-btn">
+          <span class="btn-icon">📊</span>
+          <span class="btn-text">View Quiz History</span>
+        </button>
       </div>
     </div>
   </div>
