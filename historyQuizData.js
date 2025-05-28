@@ -156,7 +156,3 @@ const historyQuizData = {
     }
   ]
 };
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { historyQuizData };
-}

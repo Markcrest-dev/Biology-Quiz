@@ -156,7 +156,3 @@ const furtherMathsQuizData = {
     }
   ]
 };
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { furtherMathsQuizData };
-}

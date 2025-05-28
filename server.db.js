@@ -23,6 +23,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
   }
 });
 
+// Create table if it doesn't exist
 db.run(`CREATE TABLE IF NOT EXISTS results (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   subject TEXT,
@@ -32,30 +33,46 @@ db.run(`CREATE TABLE IF NOT EXISTS results (
   timestamp TEXT
 )`);
 
-// Endpoint to receive quiz results
+// Get all results
+app.get('/api/quiz-results', (req, res) => {
+  const query = 'SELECT * FROM results ORDER BY timestamp DESC';
+  db.all(query, [], (err, rows) => {
+    if (err) {
+      console.error('Error fetching results:', err);
+      return res.status(500).json({ success: false, error: 'Failed to fetch results' });
+    }
+    res.json({ success: true, results: rows });
+  });
+});
+
+// Save new quiz result
 app.post('/api/quiz-result', (req, res) => {
   const { subject, difficulty, score, total, timestamp } = req.body;
+
   if (!subject || !difficulty || score == null || total == null || !timestamp) {
     return res.status(400).json({ success: false, error: 'Missing required fields' });
   }
-  const stmt = db.prepare('INSERT INTO results (subject, difficulty, score, total, timestamp) VALUES (?, ?, ?, ?, ?)');
-  stmt.run(subject, difficulty, score, total, timestamp, function (err) {
+
+  const query = 'INSERT INTO results (subject, difficulty, score, total, timestamp) VALUES (?, ?, ?, ?, ?)';
+  db.run(query, [subject, difficulty, score, total, timestamp], function (err) {
     if (err) {
       console.error('Error saving to database:', err);
       return res.status(500).json({ success: false, error: 'Failed to save result' });
     }
-    res.json({ success: true, id: this.lastID });
-  });
-  stmt.finalize();
-});
 
-// Optional: Endpoint to get all results
-app.get('/api/quiz-results', (req, res) => {
-  db.all('SELECT * FROM results ORDER BY subject, difficulty, timestamp DESC', [], (err, rows) => {
-    if (err) {
-      return res.status(500).json({ success: false, error: 'Failed to fetch results' });
-    }
-    res.json({ success: true, results: rows });
+    // After saving, fetch all results for this subject
+    const selectQuery = 'SELECT * FROM results WHERE subject = ? ORDER BY timestamp DESC';
+    db.all(selectQuery, [subject], (err, rows) => {
+      if (err) {
+        console.error('Error fetching updated results:', err);
+        return res.status(500).json({ success: false, error: 'Failed to fetch updated results' });
+      }
+      res.json({
+        success: true,
+        id: this.lastID,
+        results: rows
+      });
+    });
   });
 });
 

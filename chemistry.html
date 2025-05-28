@@ -16,8 +16,8 @@
     </nav>
 
     <div class="difficulty-selector">
-      <button class="difficulty-btn" data-level="easy">Easy 🔬</button>
-      <button class="difficulty-btn" data-level="medium">Medium ⚛️</button>
+      <button class="difficulty-btn" data-level="easy">Easy ⚛️</button>
+      <button class="difficulty-btn" data-level="medium">Medium 🔬</button>
       <button class="difficulty-btn" data-level="hard">Hard 🧪</button>
       <button id="viewResults" class="view-results-btn">View All Results 📊</button>
     </div>
@@ -25,6 +25,11 @@
     <div class="question-container hidden">
       <h2 id="question-text"></h2>
       <div class="options-container" id="options"></div>
+      <div class="navigation-buttons">
+        <button id="prevQuestion" class="nav-btn">← Previous</button>
+        <button id="skipQuestion" class="nav-btn">Skip ↷</button>
+        <button id="nextQuestion" class="nav-btn">Next →</button>
+      </div>
     </div>
 
     <div class="progress-container">
