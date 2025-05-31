@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Quiz History - Educational Hub</title>
+  <meta name="description" content="View your complete quiz history and performance statistics">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="history-styles.css">
+</head>
+
+<body>
+  <div class="container">
+    <nav class="quiz-nav">
+      <a href="subjects.html" class="back-button">← Back to Subjects</a>
+      <h1>📊 Quiz History & Statistics 📈</h1>
+    </nav>
+
+    <!-- Filter Controls -->
+    <div class="filter-controls">
+      <div class="filter-group">
+        <label for="subjectFilter">Subject:</label>
+        <select id="subjectFilter">
+          <option value="all">All Subjects</option>
+          <option value="biology">Biology</option>
+          <option value="chemistry">Chemistry</option>
+          <option value="mathematics">Mathematics</option>
+          <option value="english">English</option>
+          <option value="computer">Computer Science</option>
+          <option value="physics">Physics</option>
+          <option value="history">History</option>
+          <option value="religion">Religious Studies</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label for="difficultyFilter">Difficulty:</label>
+        <select id="difficultyFilter">
+          <option value="all">All Levels</option>
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label for="dateFilter">Date Range:</label>
+        <select id="dateFilter">
+          <option value="all">All Time</option>
+          <option value="today">Today</option>
+          <option value="week">This Week</option>
+          <option value="month">This Month</option>
+        </select>
+      </div>
+      
+      <button id="clearHistory" class="clear-btn">🗑️ Clear All History</button>
+    </div>
+
+    <!-- Statistics Overview -->
+    <div class="stats-overview">
+      <div class="stat-card">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-content">
+          <div class="stat-number" id="totalQuizzes">0</div>
+          <div class="stat-label">Total Quizzes</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-content">
+          <div class="stat-number" id="averageScore">0%</div>
+          <div class="stat-label">Average Score</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-content">
+          <div class="stat-number" id="bestScore">0%</div>
+          <div class="stat-label">Best Score</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-content">
+          <div class="stat-number" id="perfectScores">0</div>
+          <div class="stat-label">Perfect Scores</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Subject Performance Chart -->
+    <div class="performance-chart">
+      <h3>📈 Performance by Subject</h3>
+      <div id="subjectChart" class="chart-container">
+        <!-- Chart will be generated here -->
+      </div>
+    </div>
+
+    <!-- Quiz History List -->
+    <div class="history-container">
+      <div class="history-header">
+        <h3>📋 Quiz History</h3>
+        <div class="sort-controls">
+          <label for="sortBy">Sort by:</label>
+          <select id="sortBy">
+            <option value="date-desc">Date (Newest First)</option>
+            <option value="date-asc">Date (Oldest First)</option>
+            <option value="score-desc">Score (Highest First)</option>
+            <option value="score-asc">Score (Lowest First)</option>
+            <option value="subject">Subject</option>
+          </select>
+        </div>
+      </div>
+      
+      <div id="historyList" class="history-list">
+        <!-- History items will be generated here -->
+      </div>
+      
+      <div id="noHistory" class="no-history hidden">
+        <div class="no-history-icon">📚</div>
+        <h3>No Quiz History Found</h3>
+        <p>Start taking quizzes to see your progress here!</p>
+        <a href="subjects.html" class="start-quiz-btn">🚀 Start Your First Quiz</a>
+      </div>
+    </div>
+
+    <!-- Export Options -->
+    <div class="export-options">
+      <h3>📤 Export Your Data</h3>
+      <div class="export-buttons">
+        <button id="exportJSON" class="export-btn">📄 Export as JSON</button>
+        <button id="exportCSV" class="export-btn">📊 Export as CSV</button>
+        <button id="printHistory" class="export-btn">🖨️ Print History</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="history-viewer.js"></script>
+</body>
+
+</html>

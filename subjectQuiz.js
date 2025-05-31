@@ -258,16 +258,65 @@ function initializeQuiz(quizData, subject) {
     if (correct) score++;
     answeredQuestions.add(currentQuestionIndex);
 
+    // Show auto-advance indicator
+    showAutoAdvanceIndicator(currentQuestionIndex < totalQuestions - 1);
+
     setTimeout(() => {
       isAnswering = false;
       updateProgress();
       updateNavigationButtons();
 
-      // Check if all questions have been answered
-      if (answeredQuestions.size === totalQuestions) {
-        showFinishButton();
+      // Auto-advance to next question or finish quiz
+      if (currentQuestionIndex < totalQuestions - 1) {
+        // Move to next question automatically
+        currentQuestionIndex++;
+        showQuestion();
+      } else {
+        // This was the last question, show results automatically
+        showResults();
       }
-    }, 1000);
+    }, 500); // Reduced delay to 0.5 seconds for faster progression
+  }
+
+  // Show auto-advance indicator
+  function showAutoAdvanceIndicator(isNextQuestion) {
+    // Remove any existing indicator
+    const existingIndicator = document.querySelector('.auto-advance-indicator');
+    if (existingIndicator) {
+      existingIndicator.remove();
+    }
+
+    const indicator = document.createElement('div');
+    indicator.className = 'auto-advance-indicator';
+    indicator.innerHTML = isNextQuestion
+      ? '⏭️ Moving to next question...'
+      : '🏁 Finishing quiz...';
+
+    // Style the indicator
+    indicator.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(135deg, var(--primary-color), var(--dark-green));
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 25px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      animation: fadeInOut 0.5s ease-in-out;
+    `;
+
+    document.body.appendChild(indicator);
+
+    // Remove indicator after animation
+    setTimeout(() => {
+      if (indicator && indicator.parentNode) {
+        indicator.remove();
+      }
+    }, 500);
   }
 
   // Update progress indicators
